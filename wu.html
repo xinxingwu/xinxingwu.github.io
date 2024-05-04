@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="description" content="Welcome to Xinxing Wu's Homepage">
+	<title>Xinxing Wu's Homepage</title>
+	<link rel='stylesheet' href='./bootstrap/css/style.css' type='text/css'>
+	<link rel="stylesheet" href="./bootstrap/leaflet/leaflet.css"/>
+
+	<script src="./bootstrap/leaflet/leaflet.js"></script>
+	<script src="./bootstrap/js/jquery-3.3.1.min.js"></script>
+</head>
+
+<body>
+	<div id="top-banner" class="banner"></div>
+	<div id="main-body" class="wrapper">
+		<div id="site-title">
+			<div id="name">Xinxing Wu
+				<div id="subname">Ph.D. in Computer Science</div>
+			</div>
+			<div id="access">
+				<ul id="nav">
+					<li><a id="link-about" href="#about" onclick="changeNavState(id)">ABOUT</a></li>
+					<li><a id="link-research" href="#research" onclick="changeNavState(id)">MY WORK</a></li>
+					<li><a id="link-contact" href="#contact" onclick="changeNavState(id)">CONTACT</a></li>
+				</ul>
+				<select id="sel" onchange="javascript:if(this.value){location.href=this.value}">
+					<option value="" selected="selected">ABOUT</option>
+					<option value="#about">ABOUT</option>
+					<option value="#research">MY WORK</option>
+					<option value="#contact">CONTACT</option>
+				</select>				
+			</div>
+		</div>
+		<div id="content">
+		</div>
+	</div>
+
+
+	<script id="research-content" type="text/x-content">
+		<div class="container-outside">
+			<div class="container-block">
+				<h1>Work I am doing</h1>
+				<div class="container-description">
+					<div class="container-text">
+						<ul>
+							<li>
+								Github - <a href="https://github.com/xinxingwu-uk" target="_blank"> https://github.com/xinxingwu-uk</a> 
+							</li>		
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</script>
+
+
+	<script id="about-content" type="text/x-content">
+		<div class="container-outside">
+			<div class="container-block">
+				<h1>About Me</h1>
+				<div class="container-description">
+					<div id="about-me-text" class="container-text">
+						<div>
+							<p>
+								I work on 1) Machine Learning/Statistics, including feature selection algorithms, deep learning models, graph neural networks, survival analysis, and statistical computing; 2) Data analysis, including applying machine learning algorithms and statistical methods to real-world data.
+								<br>
+								<br>
+								I have a comprehensive knowledge of computer science, statistics, and mathematics; extensive experience in machine learning and data analysis; proficiency in programming skills (Mainly working with Python); solid academic research (First author papers at NeurIPS, AAAI, IJCAI, TNNLS, ...). Some representative work also can be found on my GitHub <a href="https://github.com/xinxingwu-uk" target="_blank"> https://github.com/xinxingwu-uk</a> 
+								<br>
+								<br>
+								Also, I have extensive experience teaching computer science courses, including Java SE, Java EE, PHP, C#, Python, Linux, Database, and Data Structure and Algorithm Analysis. I enjoy teaching.
+ 
+								[ <a href="./bootstrap/doc/XinxingWu_Resume.pdf" target="_blank">Download Resume</a> ]
+						    </p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			
+		</div>
+	</script>
+
+	<script id="contact-content" type="text/x-content">
+		<div class="container-outside">
+			<div class="container-block">
+				<h1>Contact</h1>
+				<div class="container-description">
+					<div id="contact-photo" class="container-text">
+						Email: <a class="social-link" href="mailto:xinxingwu@gmail.com">xinxingwu@gmail.com</a>
+					</div>
+			</div>
+		</div>
+	</script>
+
+	<script async src="./bootstrap/js/application.js"></script>
+	<script src="./bootstrap/js/backtop.js"></script>
+	<script src="./bootstrap/js/extension.js"></script>
+</body>
+</html>
+</html>
