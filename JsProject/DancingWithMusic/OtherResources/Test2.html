@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sing a Song with Melody</title>
+</head>
+<body>
+  <h1>Sing a Song with Melody</h1>
+  <button onclick="singSongWithMelody()">Start Singing</button>
+
+  <script>
+    // Helper function to play a note using Web Audio API
+    function playNote(frequency, duration) {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.type = 'sine'; // Pure tone (sine wave)
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + duration);
+    }
+
+    // Function to synthesize the song with melody and speech
+    function singSongWithMelody() {
+      const lyrics = [
+        "Twinkle, twinkle, little star,",
+        "How I wonder what you are.",
+        "Up above the world so high,",
+        "Like a diamond in the sky.",
+        "Twinkle, twinkle, little star,",
+        "How I wonder what you are."
+      ];
+
+      const melody = [
+        261.63,  // C4
+        293.66,  // D4
+        329.63,  // E4
+        349.23,  // F4
+        392.00,  // G4
+        440.00,  // A4
+        493.88,  // B4
+        523.25   // C5
+      ];
+
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance();
+      utterance.pitch = 1;
+      utterance.rate = 0.9;
+
+      function singLine(index) {
+        if (index < lyrics.length) {
+          // Play a musical note before each lyric
+          playNote(melody[index % melody.length], 0.5); // Play melody
+          utterance.text = lyrics[index];
+          synth.speak(utterance);
+
+          // Wait for the utterance to finish before singing the next line
+          utterance.onend = () => singLine(index + 1);
+        }
+      }
+
+      singLine(0);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soft Ambient Music</title>
+</head>
+<body>
+    <h2>Soft Ambient Music Generator</h2>
+    <button onclick="startMusic()">Start Music</button>
+    <button onclick="stopMusic()">Stop Music</button>
+
+    <script>
+        let audioCtx;
+        let oscillators = [];
+
+        function startMusic() {
+            // Initialization
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            stopMusic();
+
+            // Create multiple oscillators with different frequencies and types for a harmonious effect
+            const frequencies = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5 (soft harmony)
+            const waveforms = ['sine', 'triangle']; // Gentle sound wave types
+
+            frequencies.forEach((freq, index) => {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                // Set oscillator frequency and type
+                oscillator.frequency.value = freq;
+                oscillator.type = waveforms[index % waveforms.length];
+                
+                // Set volume and fade in/out for each tone
+                gainNode.gain.value = 0.2;
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 2);
+                gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 4);
+                
+                // Connect oscillator to gain, then to the audio context destination
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                // Start the oscillator
+                oscillator.start();
+                
+                // Store oscillators for stopping later
+                oscillators.push({ oscillator, gainNode });
+            });
+        }
+
+        function stopMusic() {
+            // Stop and disconnect
+            oscillators.forEach(({ oscillator, gainNode }) => {
+                gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5); // Fade out smoothly
+                oscillator.stop(audioCtx.currentTime + 1); // Stop after fade-out
+            });
+			//Clear
+            oscillators = [];
+        }
+    </script>
+</body>
+</html>
