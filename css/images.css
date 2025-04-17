@@ -1,0 +1,43 @@
+.gallery {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.photo-frame {
+  flex: 1 1 0;
+  margin: 0 10px;
+  border: 5px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s;
+  animation: pulse-border 4s ease-in-out infinite alternate;
+}
+.photo-frame:first-child { margin-left: 0; }
+.photo-frame:last-child  { margin-right: 0; }
+
+.photo-frame img {
+  display: block;
+  width: 100%;      /* fill width by default */
+  /* height on the 3rd will be set via JS for uniformity */
+}
+
+/* === new: force the 3rd image to cover its frame === */
+.photo-frame:nth-child(3) img {
+  height: 100%;        /* fill container height */
+  object-fit: cover;   /* scale & crop to fill width/height */
+}
+
+.photo-frame:hover {
+  transform: scale(1.02);
+}
+
+@keyframes pulse-border {
+  from { border-color: #ccc; }
+  to   { border-color: #ff6f61; }
+}

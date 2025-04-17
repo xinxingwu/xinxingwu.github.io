@@ -1,0 +1,12 @@
+#play {
+  font-size: 1.5rem;
+  cursor: pointer;
+  animation: pulse 1s infinite ease-in-out;
+  border: none;
+  background: none;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.2); }
+}
