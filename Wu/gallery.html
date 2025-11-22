@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Gallery</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+    }
+
+    header {
+      background: #333;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 20px auto;
+      padding: 0 10px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+    }
+
+    .image-card {
+      background: white;
+      border-radius: 6px;
+      padding: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      cursor: pointer;
+
+      /* Fade-in animation */
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .image-card img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      display: block;
+      margin: 0 auto;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Hover animation */
+    .image-card:hover img {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .image-card p {
+      margin: 5px 0 0;
+      font-size: 14px;
+      color: #555;
+    }
+
+    /* Fullscreen overlay for zoomed image */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .overlay.visible {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .overlay-content {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 95%;
+      max-height: 95%;
+    }
+
+    /* Canvas behaves like the big image */
+    #overlayCanvas {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+      background: #000;
+      display: block;
+    }
+
+    /* Left / right buttons */
+    .nav-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 28px;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-radius: 50%;
+      user-select: none;
+    }
+
+    .nav-button:hover {
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    .nav-button.prev {
+      left: -50px;
+    }
+
+    .nav-button.next {
+      right: -50px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 12px;
+      color: #777;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @media (max-width: 600px) {
+      .nav-button.prev {
+        left: -30px;
+      }
+      .nav-button.next {
+        right: -30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Image Gallery</h1>
+  </header>
+
+  <div class="container">
+    <p>
+      Click an image to view it bigger. Use ◀ ▶ to switch images.
+    </p>
+
+    <div class="gallery" id="gallery"></div>
+  </div>
+
+  <!-- Overlay for zoomed image -->
+  <div class="overlay" id="overlay">
+    <div class="overlay-content" id="overlayContent">
+      <button class="nav-button prev" id="prevBtn">&#10094;</button>
+      <canvas id="overlayCanvas"></canvas>
+      <button class="nav-button next" id="nextBtn">&#10095;</button>
+    </div>
+  </div>
+
+  <script>
+    var currentIndex = 0;          // which image is currently shown in overlay
+    var imageSources = [];         // list of all image src paths
+    var currentImageObj = null;    // Image object currently loaded
+
+    // Create 60 image cards:
+    // images/Home (1).jpg ... images/Home (60).jpg
+    function createGallery() {
+      var gallery = document.getElementById("gallery");
+      var imageCount = 58;
+
+      for (var i = 1; i <= imageCount; i++) {
+        var card = document.createElement("div");
+        card.className = "image-card";
+        card.style.animationDelay = (i * 0.05) + "s";
+
+        var img = document.createElement("img");
+        var src = "images/Home (" + i + ").jpg";
+        img.src = src;
+        img.alt = "Image " + i;
+
+        imageSources.push(src);
+        card.dataset.index = i - 1;
+
+        var caption = document.createElement("p");
+        caption.textContent = "Image " + i;
+
+        card.appendChild(img);
+        card.appendChild(caption);
+        gallery.appendChild(card);
+
+        // Left-click: open overlay with big image
+        card.addEventListener("click", function () {
+          var index = parseInt(this.dataset.index, 10);
+          openOverlay(index);
+        });
+      }
+
+      // Disable right-click (context menu) on the entire gallery area
+      // so small images cannot be saved via "Save image as..."
+      gallery.addEventListener("contextmenu", function (e) {
+        e.preventDefault();
+      });
+    }
+
+    function openOverlay(index) {
+      currentIndex = index;
+      var overlay = document.getElementById("overlay");
+      overlay.classList.add("visible");
+      loadAndDraw(false); // draw without watermark first
+    }
+
+    function closeOverlay() {
+      var overlay = document.getElementById("overlay");
+      overlay.classList.remove("visible");
+    }
+
+    // Load current image and draw it on canvas
+    function loadAndDraw(withWatermark) {
+      var src = imageSources[currentIndex];
+      var img = new Image();
+      img.onload = function () {
+        currentImageObj = img;
+        drawOnCanvas(withWatermark);
+      };
+      img.src = src;
+    }
+
+    function drawOnCanvas(withWatermark) {
+      if (!currentImageObj) return;
+
+      var canvas = document.getElementById("overlayCanvas");
+      var ctx = canvas.getContext("2d");
+      var img = currentImageObj;
+
+      // Set canvas to image size
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      // Draw original image
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      if (withWatermark) {
+        // Large, semi-transparent "Wu" in bottom-right
+        var text = "Wu";
+        var fontSize = Math.floor(canvas.width / 2); // larger watermark
+        ctx.font = "bold " + fontSize + "px Arial";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.22)"; // transparent
+        ctx.textAlign = "right";
+        ctx.textBaseline = "bottom";
+
+        var padding = Math.floor(fontSize * 0.3);
+        ctx.fillText(text, canvas.width - padding, canvas.height - padding);
+      }
+    }
+
+    function showNext() {
+      currentIndex = (currentIndex + 1) % imageSources.length;
+      loadAndDraw(false);
+    }
+
+    function showPrev() {
+      currentIndex = (currentIndex - 1 + imageSources.length) % imageSources.length;
+      loadAndDraw(false);
+    }
+
+    function setupOverlay() {
+      var overlay = document.getElementById("overlay");
+      var overlayContent = document.getElementById("overlayContent");
+      var prevBtn = document.getElementById("prevBtn");
+      var nextBtn = document.getElementById("nextBtn");
+      var overlayCanvas = document.getElementById("overlayCanvas");
+
+      // Click dark area to close
+      overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) {
+          closeOverlay();
+        }
+      });
+
+      overlayContent.addEventListener("click", function (e) {
+        e.stopPropagation();
+      });
+
+      prevBtn.addEventListener("click", function () {
+        showPrev();
+      });
+
+      nextBtn.addEventListener("click", function () {
+        showNext();
+      });
+
+      // When user right-clicks on the big image (canvas),
+      // redraw with a big transparent "Wu" watermark
+      // and let the browser show "Save image as..."
+      overlayCanvas.addEventListener("contextmenu", function () {
+        drawOnCanvas(true);
+        // do NOT preventDefault, so context menu still appears
+      });
+    }
+
+    // Initialize
+    createGallery();
+    setupOverlay();
+  </script>
+</body>
+</html>
