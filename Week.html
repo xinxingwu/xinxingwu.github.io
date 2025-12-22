@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weekly Schedule</title>
+
+  <style>
+    :root{
+      --text: #111111;
+      --muted: #444444;
+      --line: #000000;
+
+      --page: #ffffff;       /* pure white */
+      --headbg: #f2f2f2;     /* light gray header */
+      --rowbg:  #fafafa;     /* light gray time column */
+
+      /* motion vars for the card */
+      --rx: 0deg;
+      --ry: 0deg;
+      --mx: 50%;
+      --my: 35%;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: var(--page);
+      color: var(--text);
+      padding: 18px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ---- Subtle liquid background (still reads as white) ---- */
+    body::before,
+    body::after{
+      content:"";
+      position: fixed;
+      inset: -20%;
+      pointer-events: none;
+      z-index: -2;
+      opacity: .75;
+      filter: blur(28px);
+      transform: translate3d(0,0,0);
+    }
+
+    body::before{
+      background:
+        radial-gradient(600px 380px at 18% 18%, rgba(120, 180, 255, .14), transparent 60%),
+        radial-gradient(520px 360px at 78% 22%, rgba(255, 140, 210, .10), transparent 62%),
+        radial-gradient(640px 420px at 65% 80%, rgba(120, 255, 205, .10), transparent 62%);
+      animation: liquidDrift1 14s ease-in-out infinite alternate;
+    }
+
+    body::after{
+      background:
+        radial-gradient(560px 360px at 30% 70%, rgba(160, 120, 255, .10), transparent 62%),
+        radial-gradient(520px 360px at 88% 68%, rgba(255, 200, 120, .08), transparent 62%);
+      animation: liquidDrift2 18s ease-in-out infinite alternate;
+      z-index: -3;
+      opacity: .60;
+    }
+
+    @keyframes liquidDrift1{
+      from{ transform: translate(-2%, -2%) scale(1.02) rotate(-2deg); }
+      to  { transform: translate( 2%,  2%) scale(1.06) rotate( 2deg); }
+    }
+    @keyframes liquidDrift2{
+      from{ transform: translate( 2%, -1%) scale(1.03) rotate( 1deg); }
+      to  { transform: translate(-2%,  2%) scale(1.07) rotate(-2deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      body::before, body::after{ animation: none !important; }
+      .glass::before, .sheen, .grain, .bubbles{ animation: none !important; }
+      .glassWrap{ animation: none !important; }
+      thead th, tbody th, tbody td{ transition: none !important; }
+    }
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .title{
+      margin:0;
+      font-size: 20px;
+      letter-spacing: .2px;
+    }
+
+    .subtitle{
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.25rem;
+    }
+
+    /* email link: simple, clickable, a little “glass shimmer” */
+    .mail{
+      position: relative;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 750;
+      padding: 1px 2px;
+      border-radius: 6px;
+      outline: none;
+    }
+    .mail::after{
+      content:"";
+      position:absolute;
+      left: 2px;
+      right: 2px;
+      bottom: -2px;
+      height: 2px;
+      background: linear-gradient(90deg,
+        rgba(0,0,0,.18),
+        rgba(120,180,255,.40),
+        rgba(255,140,210,.35),
+        rgba(0,0,0,.18));
+      background-size: 220% 100%;
+      border-radius: 999px;
+      opacity: .70;
+      transform: scaleX(.92);
+      transform-origin: left;
+      transition: transform .25s ease, opacity .25s ease;
+      animation: underlineFlow 5.5s ease-in-out infinite;
+    }
+    @keyframes underlineFlow{
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .mail:hover::after,
+    .mail:focus-visible::after{
+      transform: scaleX(1);
+      opacity: .95;
+    }
+    .mail:focus-visible{
+      box-shadow: 0 0 0 2px rgba(0,0,0,.10);
+    }
+
+    .btn{
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 650;
+      position: relative;
+      overflow: hidden;
+      transform: translateZ(0);
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+    .btn::before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:
+        linear-gradient(110deg,
+          rgba(255,255,255,0) 35%,
+          rgba(255,255,255,.45) 45%,
+          rgba(255,255,255,0) 58%);
+      transform: translateX(-35%) rotate(10deg);
+      opacity: .55;
+      pointer-events:none;
+      transition: opacity .2s ease;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(0,0,0,.08);
+    }
+    .btn:hover::before{
+      opacity: .85;
+      animation: btnSheen 1.15s ease;
+    }
+    @keyframes btnSheen{
+      from{ transform: translateX(-35%) rotate(10deg); }
+      to  { transform: translateX(35%) rotate(10deg); }
+    }
+    .btn:active{ transform: translateY(0px) scale(.99); }
+
+    /* ---- Liquid Glass Card ---- */
+    .glassWrap{
+      animation: riseIn .65s cubic-bezier(.2,.9,.2,1) both;
+    }
+    @keyframes riseIn{
+      from{ opacity: 0; transform: translateY(10px) scale(.99); }
+      to  { opacity: 1; transform: translateY(0px) scale(1); }
+    }
+
+    /* gentle “breathing” float (separate wrapper so tilt still works) */
+    .glassWrap{
+      will-change: transform;
+      animation:
+        riseIn .65s cubic-bezier(.2,.9,.2,1) both,
+        cardFloat 9.5s ease-in-out .65s infinite;
+    }
+    @keyframes cardFloat{
+      0%   { transform: translateY(0px); }
+      50%  { transform: translateY(-2px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .glass{
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+
+      /* the “glass” */
+      background: rgba(255,255,255,.62);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+
+      /* crisp structure */
+      border: 1px solid rgba(0,0,0,.22);
+      box-shadow:
+        0 20px 55px rgba(0,0,0,.10),
+        inset 0 1px 0 rgba(255,255,255,.70),
+        inset 0 -1px 0 rgba(0,0,0,.05);
+
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform 220ms ease;
+      transform: perspective(1100px) rotateX(var(--rx)) rotateY(var(--ry));
+    }
+
+    /* animated “liquid rim glow” behind the card */
+    .glass::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      z-index:-1;
+      border-radius: 20px;
+      background:
+        conic-gradient(from 180deg,
+          rgba(120,180,255,.40),
+          rgba(255,140,210,.30),
+          rgba(120,255,205,.28),
+          rgba(160,120,255,.28),
+          rgba(120,180,255,.40)
+        );
+      filter: blur(18px);
+      opacity: .55;
+      animation: rimSpin 10s linear infinite, rimPulse 4.2s ease-in-out infinite;
+    }
+
+    @keyframes rimSpin{
+      from{ transform: rotate(0deg) scale(1.02); }
+      to  { transform: rotate(360deg) scale(1.02); }
+    }
+    @keyframes rimPulse{
+      0%,100%{ opacity: .52; }
+      50%    { opacity: .66; }
+    }
+
+    /* specular highlight that follows pointer (set via --mx/--my) */
+    .glass::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(520px 280px at var(--mx) var(--my),
+          rgba(255,255,255,.72),
+          rgba(255,255,255,.18) 28%,
+          rgba(255,255,255,0) 58%);
+      opacity: 0;
+      transition: opacity .22s ease;
+      mix-blend-mode: screen;
+    }
+    .glass.tilting::after{ opacity: .55; }
+
+    /* moving gloss / sheen overlay */
+    .sheen{
+      pointer-events:none;
+      position:absolute;
+      inset:-40%;
+      background:
+        linear-gradient(110deg,
+          rgba(255,255,255,0) 35%,
+          rgba(255,255,255,.22) 45%,
+          rgba(255,255,255,0) 58%);
+      transform: translateX(-18%) rotate(10deg);
+      animation: sheenMove 6.5s ease-in-out infinite;
+      mix-blend-mode: screen;
+    }
+
+    @keyframes sheenMove{
+      0%   { transform: translateX(-18%) rotate(10deg); opacity: .55; }
+      50%  { transform: translateX( 10%) rotate(10deg); opacity: .75; }
+      100% { transform: translateX(-18%) rotate(10deg); opacity: .55; }
+    }
+
+    /* extra subtle “bubbles” inside glass */
+    .bubbles{
+      pointer-events:none;
+      position:absolute;
+      inset:-20%;
+      opacity:.33;
+      filter: blur(10px);
+      mix-blend-mode: screen;
+      background:
+        radial-gradient(18px 18px at 18% 70%, rgba(120,180,255,.22), transparent 60%),
+        radial-gradient(26px 26px at 72% 32%, rgba(255,140,210,.18), transparent 60%),
+        radial-gradient(22px 22px at 78% 78%, rgba(120,255,205,.18), transparent 60%),
+        radial-gradient(16px 16px at 34% 28%, rgba(255,200,120,.14), transparent 60%),
+        radial-gradient(20px 20px at 54% 62%, rgba(160,120,255,.14), transparent 60%);
+      animation: bubbleMove 15s ease-in-out infinite alternate;
+      transform: translateZ(0);
+    }
+    @keyframes bubbleMove{
+      from{ transform: translate(-1.2%, -1.2%) scale(1.02); }
+      to  { transform: translate( 1.2%,  1.2%) scale(1.06); }
+    }
+
+    /* subtle “glass grain” without external images */
+    .grain{
+      pointer-events:none;
+      position:absolute;
+      inset:0;
+      opacity:.10;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(0,0,0,.10) 0px,
+          rgba(0,0,0,.10) 1px,
+          rgba(255,255,255,0) 2px,
+          rgba(255,255,255,0) 4px
+        );
+      mix-blend-mode: overlay;
+      transform: translateZ(0);
+      animation: grainShift 7s steps(6) infinite;
+    }
+    @keyframes grainShift{
+      from{ background-position: 0 0; }
+      to  { background-position: 0 22px; }
+    }
+
+    table{
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      position: relative;
+      z-index: 1;
+    }
+
+    thead th{
+      background: var(--headbg);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 10px;
+      text-align: left;
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    thead th:first-child{
+      width: 14%;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    /* Monday–Friday bigger + bold */
+    thead th:not(:first-child){
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+
+    tbody th{
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 10px;
+      text-align: left;
+      font-size: 13px;
+      color: var(--muted);
+      vertical-align: top;
+      background: var(--rowbg);
+      font-weight: 750;
+      position: relative;
+    }
+
+    tbody td{
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      padding: 12px 10px;
+      vertical-align: top;
+      font-size: 13px;
+      line-height: 1.25rem;
+      white-space: pre-wrap;
+      background: rgba(255,255,255,.30); /* slight glass feel inside */
+      position: relative;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    tbody tr td:last-child,
+    thead tr th:last-child{
+      border-right: none;
+    }
+
+    /* table hover polish (very subtle) */
+    tbody tr:hover td{
+      background: rgba(255,255,255,.45);
+    }
+    tbody td:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(0,0,0,.07);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.36));
+    }
+
+    /* load-in reveal (staggered by --d set in JS) */
+    thead th, tbody th, tbody td{
+      opacity: 0;
+      transform: translateY(6px);
+      filter: blur(2px);
+      transition:
+        opacity .55s ease var(--d, 0ms),
+        transform .55s ease var(--d, 0ms),
+        filter .55s ease var(--d, 0ms);
+    }
+    body.loaded thead th,
+    body.loaded tbody th,
+    body.loaded tbody td{
+      opacity: 1;
+      transform: translateY(0px);
+      filter: blur(0px);
+    }
+
+    /* click ripple */
+    .ripple{
+      position:absolute;
+      border-radius: 999px;
+      pointer-events:none;
+      background: radial-gradient(circle,
+        rgba(120,180,255,.30),
+        rgba(255,255,255,.18) 35%,
+        rgba(255,255,255,0) 70%);
+      transform: scale(.25);
+      opacity: .95;
+      animation: ripplePop .55s ease-out forwards;
+      mix-blend-mode: screen;
+    }
+    @keyframes ripplePop{
+      to{ transform: scale(1.05); opacity: 0; }
+    }
+
+    /* Print: remove effects, keep one-page compact */
+    @media print{
+      body{
+        background:#fff !important;
+        padding:0 !important;
+      }
+      body::before, body::after{ display:none !important; }
+
+      .wrap{
+        max-width:none !important;
+        margin:0 !important;
+      }
+      .btn{ display:none !important; }
+
+      .topbar{ margin-bottom: 8px !important; }
+      .title{ font-size: 16px !important; }
+      .subtitle{ font-size: 11px !important; }
+
+      .glassWrap{ animation: none !important; transform:none !important; }
+      .glass{
+        background:#fff !important;
+        backdrop-filter:none !important;
+        -webkit-backdrop-filter:none !important;
+        box-shadow:none !important;
+        border: 1px solid #000 !important;
+        border-radius: 10px !important;
+        transform:none !important;
+      }
+      .glass::before, .glass::after, .sheen, .grain, .bubbles{ display:none !important; }
+
+      thead th, tbody th, tbody td{
+        padding: 8px 8px !important;
+        font-size: 11.5px !important;
+        line-height: 1.15rem !important;
+        border-color:#000 !important;
+
+        opacity: 1 !important;
+        transform:none !important;
+        filter:none !important;
+      }
+      thead th:not(:first-child){
+        font-size: 12.5px !important;
+        font-weight: 800 !important;
+      }
+      tbody td{ background:#fff !important; box-shadow:none !important; }
+
+      @page{
+        size: letter;
+        margin: 8mm;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1 class="title">Ian's Weekly Schedule</h1>
+        <div class="subtitle">
+          I am working hard every second 😊
+        </div>
+      </div>
+      <button class="btn" type="button" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    </div>
+
+    <div class="glassWrap">
+      <div class="glass" id="glassCard" aria-label="Schedule card">
+        <div class="bubbles"></div>
+        <div class="sheen"></div>
+        <div class="grain"></div>
+
+        <table aria-label="Weekly schedule table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Sunday</th>
+              <th>Monday</th>
+              <th>Tuesday</th>
+              <th>Wednesday</th>
+              <th>Thursday</th>
+              <th>Friday</th>
+              <th>Saturday</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>
+                AM<br>
+                <span style="font-weight:600; font-size:11px; color:#555;">Before 12:00 PM</span>
+              </th>
+              <td>1. <b>Piano</b> - 45 minutes  </td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed blue;"> 2. <b><a href="https://courseware.cemc.uwaterloo.ca/11#utm_source=Courseware+LP&utm_medium=website&utm_campaign=Gr+12+Calculus+Vectors" target="_blank">Math</a>
+</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed blue;"> 3. <b>Reading</b> - 45 minutes and then rest for 15 minutes </td> </td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed green;"> 2. <b><a href="https://courseware.cemc.uwaterloo.ca/11#utm_source=Courseware+LP&utm_medium=website&utm_campaign=Gr+12+Calculus+Vectors" target="_blank">Math</a>
+</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed green;"> 3. <b>Reading</b> - 45 minutes and then rest for 15 minutes </td> </td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed black;"> 2. <b><a href="https://courseware.cemc.uwaterloo.ca/11#utm_source=Courseware+LP&utm_medium=website&utm_campaign=Gr+12+Calculus+Vectors" target="_blank">Math</a>
+</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed black;"> 3. <b>Reading</b> - 45 minutes and then rest for 15 minutes </td></td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed yellow;"> 2. <b><a href="https://courseware.cemc.uwaterloo.ca/11#utm_source=Courseware+LP&utm_medium=website&utm_campaign=Gr+12+Calculus+Vectors" target="_blank">Math</a>
+</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed yellow;"> 3. <b>Reading</b> - 45 minutes and then rest for 15 minutes </td></td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed purple;"> 2. <b><a href="https://courseware.cemc.uwaterloo.ca/11#utm_source=Courseware+LP&utm_medium=website&utm_campaign=Gr+12+Calculus+Vectors" target="_blank">Math</a>
+</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed purple;"> 3. <b>Reading</b> - 45 minutes and then rest for 15 minutes </td> </td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed cyan;"> 2. <b><a href="https://courseware.cemc.uwaterloo.ca/11#utm_source=Courseware+LP&utm_medium=website&utm_campaign=Gr+12+Calculus+Vectors" target="_blank">Math</a>
+</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed cyan;"> 3. <b>Reading</b> - 45 minutes and then rest for 15 minutes </td></td>
+            </tr>
+            <tr>
+              <th>
+                PM<br>
+                <span style="font-weight:600; font-size:11px; color:#555;">After 12:00 PM</span>
+              </th>
+              <td>1. <b><a href="https://courseware.cemc.uwaterloo.ca/11#utm_source=Courseware+LP&utm_medium=website&utm_campaign=Gr+12+Calculus+Vectors" target="_blank">Math</a>
+</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed red;"> 2. <b>Reading</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed red;"> 3. <b>Running</b></td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes  <hr style="border-top: 1.5px dashed blue;"> 2. <b>Math</b> - 45 minutes and then rest for 15 minutes  <hr style="border-top: 1.5px dashed blue;"> 3. <b>Reading</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed blue;"> 4. <b>Math</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed blue;"> 5. <b>Running</b> </td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed green;"> 2. <b>Math</b> - 45 minutes and then rest for 15 minutes  <hr style="border-top: 1.5px dashed green;"> 3. <b>Reading</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed green;"> 4. <b>Math</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed green;"> 5. <b>Running</b></td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed black;"> 2. <b>Math</b> - 45 minutes and then rest for 15 minutes  <hr style="border-top: 1.5px dashed black;"> 3. <b>Reading</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed black;"> 4. <b>Math</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed black;"> 5. <b>Running</b> </td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed yellow;"> 2. <b>Math</b> - 45 minutes and then rest for 15 minutes  <hr style="border-top: 1.5px dashed yellow;"> 3. <b>Reading</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed yellow;"> 4. <b>Math</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed yellow;"> 5. <b>Running</b> </td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed purple;"> 2. <b>Math</b> - 45 minutes and then rest for 15 minutes  <hr style="border-top: 1.5px dashed purple;"> 3. <b>Reading</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed purple;"> 4. <b>Math</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed purple;"> 5. <b>Running</b> </td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed cyan;"> 2. <b>Math</b> - 45 minutes and then rest for 15 minutes  <hr style="border-top: 1.5px dashed cyan;"> 3. <b>Reading</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed cyan;"> 4. <b>Math</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed cyan;"> 5. <b>Running</b></td>
+            </tr>
+            <tr>
+              <th>
+                Evening<br>
+                <span style="font-weight:600; font-size:11px; color:#555;">After 6:30 PM</span>
+              </th>
+              <td>1. <b>Piano</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed red;"> 2. <b>Reading</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed red;"> 3. <b>Taekwondo</b> - 5 times</td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed blue;"> 2. <b>Reading</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed blue;"> 3. <b>Taekwondo</b> - 5 times </td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed green;"> 2. <b>Math</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed green;"> 3. <b>Taekwondo</b> - 5 times </td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed black;"> 2. <b>Reading</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed black;"> 3. <b>Taekwondo</b> - 5 times</td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed yellow;"> 2. <b>Math</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed yellow;"> 3. <b>Taekwondo</b> - 5 times</td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed purple;"> 2. <b>Reading</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed purple;"> 3. <b>Taekwondo</b> - 5 times</td>
+              <td>1. <b>Piano</b> - 1 hour and then rest for 15 minutes <hr style="border-top: 1.5px dashed cyan;"> 2. <b>Math</b> - 45 minutes and then rest for 15 minutes <hr style="border-top: 1.5px dashed cyan;"> 3. <b>Taekwondo</b> - 5 times</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ 
+  <script>
+    (function(){
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+      window.addEventListener('DOMContentLoaded', function(){
+        // stagger reveal
+        const cells = document.querySelectorAll('thead th, tbody th, tbody td');
+        for(let i = 0; i < cells.length; i++){
+          cells[i].style.setProperty('--d', Math.min(i * 18, 600) + 'ms');
+        }
+        document.body.classList.add('loaded');
+
+        // parallax tilt + highlight
+        const card = document.getElementById('glassCard');
+        if(card && !reduceMotion){
+          function setFromEvent(e){
+            const r = card.getBoundingClientRect();
+            const x = clamp((e.clientX - r.left) / r.width, 0, 1);
+            const y = clamp((e.clientY - r.top) / r.height, 0, 1);
+
+            const ry = (x - 0.5) * 8;   // deg
+            const rx = (0.5 - y) * 6;   // deg
+
+            card.style.setProperty('--rx', rx.toFixed(2) + 'deg');
+            card.style.setProperty('--ry', ry.toFixed(2) + 'deg');
+            card.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
+            card.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+            card.classList.add('tilting');
+          }
+
+          function resetTilt(){
+            card.classList.remove('tilting');
+            card.style.setProperty('--rx', '0deg');
+            card.style.setProperty('--ry', '0deg');
+            card.style.setProperty('--mx', '50%');
+            card.style.setProperty('--my', '35%');
+          }
+
+          card.addEventListener('pointermove', setFromEvent);
+          card.addEventListener('pointerdown', setFromEvent);
+          card.addEventListener('pointerleave', resetTilt);
+          resetTilt();
+        }
+
+        // click ripple on table cells
+        document.addEventListener('click', function(e){
+          const cell = e.target.closest('td, th');
+          if(!cell || !cell.closest('table') || reduceMotion) return;
+
+          const r = cell.getBoundingClientRect();
+          const ripple = document.createElement('span');
+          ripple.className = 'ripple';
+
+          const size = Math.max(r.width, r.height) * 1.15;
+          ripple.style.width = ripple.style.height = size + 'px';
+          ripple.style.left = (e.clientX - r.left - size / 2) + 'px';
+          ripple.style.top  = (e.clientY - r.top  - size / 2) + 'px';
+
+          cell.appendChild(ripple);
+          ripple.addEventListener('animationend', function(){ ripple.remove(); }, { once: true });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
