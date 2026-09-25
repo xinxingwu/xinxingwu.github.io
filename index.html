@@ -364,6 +364,332 @@
       .project { flex-direction: column; gap: 10px; }
     }
 
+
+    /* Responsive refinements for tablets and phones. Desktop layout remains unchanged. */
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    img, svg, video {
+      max-width: 100%;
+    }
+
+    .hero-grid > *,
+    .research-grid > *,
+    .project-grid > *,
+    .teaching-grid > *,
+    .contact-card > *,
+    .section-head > * {
+      min-width: 0;
+    }
+
+    .pub-title,
+    .pub-meta,
+    .project h3,
+    .project p,
+    .course-list li,
+    .about-card p,
+    .contact-card p {
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 900px) {
+      .wrap {
+        width: min(calc(100% - 32px), var(--max));
+      }
+
+      .nav {
+        gap: 16px;
+      }
+
+      .nav-links {
+        gap: 14px;
+      }
+
+      .hero {
+        padding: 58px 0 42px;
+      }
+
+      .hero-grid {
+        gap: 32px;
+      }
+
+      .research-card .num {
+        width: 100%;
+        max-width: 100%;
+        min-height: 34px;
+        height: auto;
+        padding: 7px 10px;
+        text-align: center;
+        line-height: 1.25;
+      }
+
+      .flying-flyer {
+        width: 112px;
+        height: 58px;
+      }
+
+      .flyer-bird-label {
+        min-width: 58px;
+        padding: 4px 10px 5px;
+        font-size: 0.73rem;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .wrap {
+        width: min(calc(100% - 24px), var(--max));
+      }
+
+      header {
+        backdrop-filter: blur(10px);
+      }
+
+      .nav {
+        width: 100%;
+        min-height: 0;
+        padding: 10px 0 8px;
+        gap: 7px;
+      }
+
+      .brand {
+        font-size: 0.98rem;
+      }
+
+      .nav-links {
+        width: 100%;
+        max-width: 100%;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 16px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 2px 1px 5px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        scroll-snap-type: x proximity;
+      }
+
+      .nav-links::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-links a {
+        flex: 0 0 auto;
+        scroll-snap-align: start;
+        font-size: 0.86rem;
+      }
+
+      .hero {
+        padding: 34px 0 30px;
+      }
+
+      .hero-grid {
+        gap: 22px;
+      }
+
+      .eyebrow {
+        max-width: 100%;
+        margin-bottom: 14px;
+        padding: 6px 10px;
+        font-size: 0.76rem;
+        line-height: 1.35;
+        white-space: normal;
+      }
+
+      h1 {
+        font-size: clamp(2.15rem, 13vw, 3.15rem);
+        line-height: 1;
+        letter-spacing: -0.045em;
+      }
+
+      .hero h2 {
+        margin: 14px 0 12px;
+        font-size: clamp(1.02rem, 5.2vw, 1.22rem);
+      }
+
+      .hero p {
+        font-size: 0.96rem;
+        line-height: 1.6;
+      }
+
+      .hero-actions,
+      .contact-links {
+        width: 100%;
+        gap: 8px;
+      }
+
+      .hero-actions .button,
+      .contact-links .button {
+        flex: 1 1 calc(50% - 8px);
+        min-width: 128px;
+      }
+
+      section {
+        padding: 24px 0;
+        scroll-margin-top: 112px;
+      }
+
+      .section-head {
+        margin-bottom: 14px;
+      }
+
+      .section-head h2 {
+        font-size: clamp(1.42rem, 7vw, 1.8rem);
+      }
+
+      .section-head p {
+        font-size: 0.88rem;
+      }
+
+      .about-card,
+      .research-card,
+      .pub-group,
+      .teaching-card,
+      .contact-card {
+        padding: 18px;
+        border-radius: 15px;
+      }
+
+      .research-grid,
+      .project-grid,
+      .teaching-grid {
+        gap: 12px;
+      }
+
+      .research-card .num {
+        font-size: 0.82rem;
+      }
+
+      .pub-list li {
+        padding: 11px 0;
+      }
+
+      .pub-title {
+        font-size: 0.97rem;
+      }
+
+      .pub-meta {
+        font-size: 0.84rem;
+      }
+
+      .pub-links {
+        font-size: 0.84rem;
+      }
+
+      .project {
+        padding: 17px 18px;
+      }
+
+      .project a {
+        white-space: normal;
+        align-self: flex-start;
+      }
+
+      .teaching-head {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 3px;
+        margin-bottom: 12px;
+      }
+
+      .teaching-head span {
+        white-space: normal;
+      }
+
+      .teaching-grid {
+        gap: 18px;
+      }
+
+      .course-list li {
+        font-size: 0.8rem;
+        line-height: 1.46;
+      }
+
+      .contact-card {
+        gap: 16px;
+      }
+
+      footer {
+        padding: 28px 0 34px;
+      }
+
+      .flying-flyer {
+        width: 92px;
+        height: 50px;
+        filter: drop-shadow(0 7px 9px rgba(0, 53, 39, 0.24));
+      }
+
+      .flyer-bird-label {
+        min-width: 0;
+        padding: 3px 7px 4px;
+        border-width: 1.5px;
+        font-size: 0.61rem;
+        letter-spacing: 0.025em;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .wrap {
+        width: min(calc(100% - 18px), var(--max));
+      }
+
+      .brand {
+        font-size: 0.94rem;
+      }
+
+      .nav-links {
+        gap: 14px;
+      }
+
+      .nav-links a {
+        font-size: 0.82rem;
+      }
+
+      .hero {
+        padding-top: 28px;
+      }
+
+      h1 {
+        font-size: clamp(2rem, 13vw, 2.7rem);
+      }
+
+      .hero-actions .button,
+      .contact-links .button {
+        flex-basis: 100%;
+        width: 100%;
+      }
+
+      .about-card,
+      .research-card,
+      .pub-group,
+      .teaching-card,
+      .contact-card,
+      .project {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+
+      .flying-flyer {
+        width: 82px;
+        height: 46px;
+      }
+
+      .flyer-bird-label {
+        font-size: 0.56rem;
+        padding-left: 6px;
+        padding-right: 6px;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 520px) {
+      .flying-flyer {
+        width: 82px;
+        height: 44px;
+      }
+    }
+
     @media print {
       header, .hero-art, #musicButton { display: none !important; }
       body { background: #fff; }
