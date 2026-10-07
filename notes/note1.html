@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f7f9fc" />
+
+  <meta name="description" content="A place for anything worth writing down — a note by Xinxing Wu." />
+  <link rel="icon" type="image/png" href="../img/programming.gif" />
+  <link rel="apple-touch-icon" href="../img/programming.gif" />
+  <title>Wu | A place for anything worth writing down</title>
+<style>
+    :root {
+      --bg: #f7f9fc;
+      --surface: #ffffff;
+      --text: #18212f;
+      --muted: #667085;
+      --line: #e6eaf0;
+      --blue: #1457a6;
+      --blue-dark: #0b3f7c;
+      --blue-soft: #edf5ff;
+      --shadow: 0 10px 28px rgba(31, 42, 68, 0.08);
+      --radius: 18px;
+      --max: 1080px;
+      --reading: 790px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--bg); }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { width: min(calc(100% - 36px), var(--max)); margin: 0 auto; }
+
+    .topbar {
+      background: rgba(255,255,255,.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .nav {
+      min-height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .brand-wrap { display: flex; align-items: center; gap: 14px; }
+    .brand { font-size: 1.85rem; line-height: 1; font-weight: 800; letter-spacing: -.055em; }
+    .tabs { display: flex; align-items: center; gap: 34px; font-size: 1.02rem; }
+    .tabs a { position: relative; padding: 9px 0; font-weight: 600; color: #344054; }
+    .tabs a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 4px;
+      height: 2px;
+      background: var(--blue);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform .18s ease;
+    }
+    .tabs a:hover, .tabs a.active { color: var(--blue-dark); text-decoration: none; }
+    .tabs a:hover::after, .tabs a.active::after { transform: scaleX(1); }
+
+    main { padding: 54px 0 70px; }
+    .article-shell {
+      width: min(calc(100% - 36px), var(--reading));
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 50px 58px 46px;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 34px;
+      color: var(--muted);
+      font-size: .92rem;
+      font-weight: 650;
+    }
+    .back-link:hover { color: var(--blue-dark); text-decoration: none; }
+    .tag {
+      display: inline-block;
+      margin: 0 8px 13px 0;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      font-size: .78rem;
+      font-weight: 750;
+      letter-spacing: .035em;
+    }
+    .article-header h1 {
+      margin: 0;
+      font-size: clamp(2.45rem, 5vw, 4rem);
+      line-height: 1.03;
+      letter-spacing: -.05em;
+      text-wrap: balance;
+    }
+    .dek {
+      margin: 20px 0 0;
+      color: #475467;
+      font-size: 1.14rem;
+      line-height: 1.7;
+      max-width: 700px;
+    }
+    .meta {
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    .article-divider {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 34px 0 31px;
+    }
+    .article-body {
+      color: #344054;
+      font-size: 1.075rem;
+      line-height: 1.86;
+    }
+    .article-body p { margin: 0 0 1.35em; }
+    .article-body p:first-child {
+      font-size: 1.12rem;
+      color: #27364a;
+    }
+    .article-body h2 {
+      margin: 2em 0 .65em;
+      color: var(--text);
+      font-size: 1.45rem;
+      line-height: 1.3;
+      letter-spacing: -.02em;
+    }
+    .article-body blockquote {
+      margin: 1.7em 0;
+      padding: 2px 0 2px 20px;
+      border-left: 3px solid var(--blue);
+      color: #475467;
+    }
+    .article-footer {
+      margin-top: 38px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .article-footer a { font-weight: 650; }
+    .footer {
+      width: min(calc(100% - 36px), var(--reading));
+      margin: 30px auto 0;
+      color: var(--muted);
+      font-size: .88rem;
+      text-align: center;
+    }
+
+    /* Responsive refinements for tablets and phones. Desktop layout is unchanged. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+
+    @media (max-width: 900px) {
+      .wrap { width: min(calc(100% - 32px), var(--max)); }
+      .nav { gap: 18px; }
+      .brand { font-size: 1.65rem; }
+      .tabs { gap: 24px; font-size: .98rem; }
+      .article-shell { width: min(calc(100% - 32px), var(--reading)); padding: 44px 46px 40px; }
+    }
+
+    @media (max-width: 700px) {
+      .wrap { width: min(calc(100% - 24px), var(--max)); }
+      .nav {
+        min-height: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 8px;
+        padding: 13px 0 9px;
+      }
+      .brand { font-size: 1.34rem; line-height: 1.15; }
+      .tabs {
+        width: 100%;
+        max-width: 100%;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 22px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 2px 1px 6px;
+        font-size: .93rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .tabs::-webkit-scrollbar { display: none; }
+      .tabs a { flex: 0 0 auto; white-space: nowrap; }
+      main { padding: 32px 0 52px; }
+      .article-shell {
+        width: min(calc(100% - 24px), var(--reading));
+        padding: 34px 28px 31px;
+        border-radius: 20px;
+      }
+      .back-link { margin-bottom: 26px; }
+      .article-header h1 { font-size: clamp(2.25rem, 9vw, 3.15rem); }
+      .dek { font-size: 1.06rem; }
+      .article-body { font-size: 1.02rem; line-height: 1.8; }
+      .article-body p:first-child { font-size: 1.07rem; }
+      .article-divider { margin: 28px 0 26px; }
+    }
+
+    @media (max-width: 480px) {
+      .wrap { width: min(calc(100% - 20px), var(--max)); }
+      .brand { font-size: 1.22rem; }
+      .tabs { gap: 18px; font-size: .88rem; }
+      main { padding-top: 24px; }
+      .article-shell {
+        width: min(calc(100% - 20px), var(--reading));
+        padding: 28px 19px 26px;
+        border-radius: 17px;
+      }
+      .back-link { margin-bottom: 22px; font-size: .88rem; }
+      .article-header h1 { font-size: clamp(2rem, 11vw, 2.7rem); }
+      .dek { margin-top: 16px; font-size: 1rem; line-height: 1.65; }
+      .meta { margin-top: 17px; font-size: .84rem; }
+      .article-body { font-size: 1rem; line-height: 1.77; }
+      .article-body p:first-child { font-size: 1.04rem; }
+      .article-footer { align-items: flex-start; flex-direction: column; }
+      .footer { width: min(calc(100% - 20px), var(--reading)); }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap nav">
+      <div class="brand-wrap">
+        <a class="brand" href="../posts.html">Wu's Homepage</a>
+      </div>
+      <nav class="tabs" aria-label="Primary navigation">
+        <a href="../posts.html">Posts</a>
+        <a class="active" href="../notes.html" aria-current="page">Notes</a>
+        <a href="../index.html">Me</a>
+        <a href="../faq.html">FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <article class="article-shell">
+      <a class="back-link" href="../notes.html">← Back to Notes</a>
+
+      <header class="article-header">
+        <span class="tag">WELCOME</span>
+        <h1>A place for anything worth writing down</h1>
+        <p class="dek">Everyday learning, small thoughts, personal reflections, faith, questions, and moments I do not want to forget.</p>
+        <div class="meta"><time datetime="2026-10-05">October 5, 2026</time> · Xinxing Wu</div>
+      </header>
+
+      <hr class="article-divider" />
+
+      <div class="article-body">
+        <p>This page is intentionally broader than my Posts page. Not everything needs to be formal, technical, or polished.</p>
+        <p>I can use it for something I learned today, an idea from teaching or research, a feeling, a question, a Christian reflection, a Bible passage that makes me think, or simply something from everyday life.</p>
+      </div>
+
+      <div class="article-footer">
+        <a href="../notes.html">← Back to all Notes</a>
+      </div>
+    </article>
+
+    <div class="footer">© <span id="year"></span> Xinxing Wu</div>
+  </main>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
